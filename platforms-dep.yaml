@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: platformservice
-          image: binarythistle/platformservice:latest
+          image: dachimagaria/platformservice:latest
 ---
 apiVersion: v1
 kind: Service
