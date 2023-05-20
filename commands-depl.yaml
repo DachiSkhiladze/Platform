@@ -1,31 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: platforms-depl
+  name: commands-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: platformservice
+      app: coomandservice
   template:
     metadata:
       labels:
-        app: platformservice
+        app: coomandservice
     spec:
       containers:
-        - name: platformservice
-          image: dachimagaria/platformservice:latest
+        - name: coomandservice
+          image: dachimagaria/coomandservice:latest
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: platforms-clusterip-srv
+  name: commands-clusterip-srv
 spec:
   type: ClusterIP
   selector:
-    app: platformservice
+    app: coomandservice
   ports:
-  - name: platformservice
+  - name: coomandservice
     protocol: TCP
     port: 80
     targetPort: 80

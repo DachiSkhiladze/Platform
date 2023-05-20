@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformService.Data;
 using PlatformService.DTOs;
 using PlatformService.Models;
+using PlatformService.SyncDataServices.Http;
 
 namespace PlatformService.Controllers
 {
@@ -11,13 +12,14 @@ namespace PlatformService.Controllers
     public class PlatformsController : ControllerBase
     {
         private readonly IPlatformRepo _repo;
-
         public readonly IMapper _mapper;
+        private readonly ICommandDataClient _commandDataClient;
 
-        public PlatformsController(IPlatformRepo repo, IMapper mapper)
+        public PlatformsController(IPlatformRepo repo, ICommandDataClient commandDataClient, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
+            _commandDataClient = commandDataClient;
         }
 
         [HttpGet]
@@ -44,20 +46,24 @@ namespace PlatformService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<PlatformReadDTO> CreatePlatform(PlatformCreateDTO platformCreateDTO)
+        public async Task<ActionResult<PlatformReadDTO>> CreatePlatform(PlatformCreateDTO platformCreateDTO)
         {
             var platformModel = _mapper.Map<Platform>(platformCreateDTO);
-            if (platformModel is not null)
+            _repo.CreatePlatform(platformModel);
+            _repo.SaveChanges();
+
+            var platformReadDTO = _mapper.Map<PlatformReadDTO>(platformModel);
+
+            try
             {
-                _repo.CreatePlatform(platformModel);
-                _repo.SaveChanges();
-
-                var platformReadDTO = _mapper.Map<PlatformReadDTO>(platformModel);
-
-                return CreatedAtRoute(nameof(GetPlatformById), new { Id = platformReadDTO.id }, platformReadDTO);
+                await _commandDataClient.SendPlatformToCommand(platformReadDTO);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--> Could not send synchronously: {ex.Message}");
             }
 
-            return StatusCode(StatusCodes.Status400BadRequest);
+            return CreatedAtRoute(nameof(GetPlatformById), new { Id = platformReadDTO.id }, platformReadDTO);
         }
     }
 }
