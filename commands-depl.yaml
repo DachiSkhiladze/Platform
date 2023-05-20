@@ -6,15 +6,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: coomandservice
+      app: coommandservice
   template:
     metadata:
       labels:
-        app: coomandservice
+        app: coommandservice
     spec:
       containers:
-        - name: coomandservice
-          image: dachimagaria/coomandservice:latest
+        - name: coommandservice
+          image: dachimagaria/coommandservice:latest
 ---
 apiVersion: v1
 kind: Service
@@ -23,9 +23,9 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: coomandservice
+    app: coommandservice
   ports:
-  - name: coomandservice
+  - name: coommandservice
     protocol: TCP
     port: 80
     targetPort: 80
