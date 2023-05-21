@@ -12,8 +12,9 @@ namespace CommandsService.Profiles
             CreateMap<Platform, PlatformReadDto>().ReverseMap();
             CreateMap<Command, CommandCreateDto>().ReverseMap();
             CreateMap<Command, CommandReadDto>().ReverseMap();
-            CreateMap<Platform, PlatformPublishedDto>().ReverseMap()
-                .ForMember(dest => dest.ExternaID, opt => opt.MapFrom(src => src.Id));
+            CreateMap<PlatformPublishedDto, Platform>()
+              .ForMember(dest => dest.ExternalID, opt => opt.MapFrom(src => src.Id))
+              .ReverseMap();
         }
     }
 }
